@@ -8,20 +8,18 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Yoav Aharoni
  */
-public class HtmlImageGenerator {
+public class HtmlImageGenerator
+{
     private JEditorPane editorPane;
     static final Dimension DEFAULT_SIZE = new Dimension(800, 800);
 
@@ -48,7 +46,8 @@ public class HtmlImageGenerator {
     public void loadUrl(URL url) {
         try {
             editorPane.setPage(url);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(String.format("Exception while loading %s", url), e);
         }
     }
@@ -56,7 +55,8 @@ public class HtmlImageGenerator {
     public void loadUrl(String url) {
         try {
             editorPane.setPage(url);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(String.format("Exception while loading %s", url), e);
         }
     }
@@ -78,7 +78,9 @@ public class HtmlImageGenerator {
                 final int y1 = (int) bound.getY();
                 final int x2 = (int) (x1 + bound.getWidth());
                 final int y2 = (int) (y1 + bound.getHeight());
-                markup.append(String.format("<area href=\"%s\" coords=\"%s,%s,%s,%s\" shape=\"rect\"", link.getHref(), x1, y1, x2, y2));
+                markup.append(
+                        String.format("<area href=\"%s\" coords=\"%s,%s,%s,%s\" shape=\"rect\"", link.getHref(), x1, y1,
+                                x2, y2));
                 final String title = link.getTitle();
                 if (title != null && !title.equals("")) {
                     markup.append(" title=\"").append(title.replace("\"", "&quot;")).append("\"");
@@ -91,8 +93,6 @@ public class HtmlImageGenerator {
     }
 
     public List<LinkInfo> getLinks() {
-//        final LinkHarvester harvester = new LinkHarvester(editorPane);
-//        return harvester.getLinks();
         return Collections.emptyList();
     }
 
@@ -104,7 +104,8 @@ public class HtmlImageGenerator {
         FileWriter writer = null;
         try {
             writer = new FileWriter(file);
-            writer.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
+            writer.append(
+                    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
             writer.append("<html>\n<head></head>\n");
             writer.append("<body style=\"margin: 0; padding: 0; text-align: center;\">\n");
             final String htmlMap = getLinksMapMarkup("map");
@@ -113,13 +114,16 @@ public class HtmlImageGenerator {
             writer.append(imageUrl);
             writer.append("\"/>\n");
             writer.append("</body>\n</html>");
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(String.format("Exception while saving '%s' html file", file), e);
-        } finally {
+        }
+        finally {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (IOException ignore) {
+                }
+                catch (IOException ignore) {
                 }
             }
         }
@@ -133,15 +137,18 @@ public class HtmlImageGenerator {
     public void saveAsImage(File file) {
         BufferedImage image = getBufferedImage();
 
-        BufferedImage bufferedImageToWrite = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        BufferedImage bufferedImageToWrite = new BufferedImage(image.getWidth(), image.getHeight(),
+                BufferedImage.TYPE_INT_RGB);
         bufferedImageToWrite.createGraphics().drawImage(image, 0, 0, Color.WHITE, null);
 
         final String formatName = FormatNameUtil.formatForFilename(file.getName());
 
         try {
-            if (!ImageIO.write(bufferedImageToWrite, formatName, file))
+            if (!ImageIO.write(bufferedImageToWrite, formatName, file)) {
                 throw new IOException("No formatter for specified file type [" + formatName + "] available");
-        } catch (IOException e) {
+            }
+        }
+        catch (IOException e) {
             throw new RuntimeException(String.format("Exception while saving '%s' image", file), e);
         }
     }
@@ -179,11 +186,9 @@ public class HtmlImageGenerator {
         final SynchronousHTMLEditorKit kit = new SynchronousHTMLEditorKit();
         editorPane.setEditorKitForContentType("text/html", kit);
         editorPane.setContentType("text/html");
-        editorPane.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals("page")) {
-                    onDocumentLoad();
-                }
+        editorPane.addPropertyChangeListener(evt -> {
+            if ("page".equals(evt.getPropertyName())) {
+                onDocumentLoad();
             }
         });
         return editorPane;

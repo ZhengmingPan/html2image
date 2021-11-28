@@ -13,14 +13,17 @@ import javax.swing.text.html.ImageView;
  */
 public class SynchronousHTMLEditorKit extends HTMLEditorKit {
 
+        @Override
         public Document createDefaultDocument() {
                 HTMLDocument doc = (HTMLDocument) super.createDefaultDocument();
                 doc.setAsynchronousLoadPriority(-1);
                 return doc;
         }
 
+        @Override
         public ViewFactory getViewFactory() {
                 return new HTMLFactory() {
+                        @Override
                         public View create(Element elem) {
                                 View view = super.create(elem);
                                 if (view instanceof ImageView) {
